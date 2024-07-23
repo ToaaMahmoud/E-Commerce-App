@@ -3,13 +3,10 @@ import Category from "../../../../db/models/category.model.js";
 import { AppError } from "../../../utlis/appError.js";
 
 export const addCategory = async (req, res, next) => {
-  const { name } = req.body;
-  const slug = slugify(name);
-  const category = new Category({
-    name,
-    slug,
-  });
-  await category.save();
+  if(req.body.name) req.body.slug = slugify(req.body.name)
+  const image = req.file ? req.file.filename : null;
+  if(image) req.body.image = image
+  const category = await Category.create(req.body)
   return res.status(201).json({ message: "Category added successfully." });
 };
 
@@ -30,9 +27,10 @@ export const getCategory = async (req, res, next) => {
 
 export const updateCategory = async (req, res, next) => {
   const { _id } = req.params;
-  const { ...updatedData } = req.body;
-  if ("name" in updatedData) updatedData.slug = slugify(updatedData.name);
-  const category = await Category.findByIdAndUpdate(_id, { ...updatedData }, {new: true});
+  if (req.body.name) req.body.slug = slugify(req.body.name);
+  const image = req.file ? req.file.filename : null;
+  if(image) req.body.image = image
+  const category = await Category.findByIdAndUpdate(_id,req.body, {new: true});
   return !category
     ? next(new AppError("This category is not found.", 404))
     : res.status(200).json({ message: "Category updated successfully.", "Updated Category" :category });

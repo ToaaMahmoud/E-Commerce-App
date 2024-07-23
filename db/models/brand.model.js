@@ -14,7 +14,10 @@ const brandSchema = new Schema({
         required: [true, "Slug is required."],
         lowerCase: true
     },
-    image: String,
+    image: {
+        type: String,
+        set: (value) => `http://localhost:3000/brand/${value}`
+    },
     // createdBy:{
         // type: Schema.ObjectId,
         // required: [true, "CreatedBy is required."],

@@ -14,7 +14,10 @@ const subCategorySchema = new Schema({
         required: [true, "Slug is required."],
         lowerCase: true
     },
-    image: String,
+    image: {
+        type: String,
+        set: (value) => `http://localhost:3000/subcategory/${value}`
+    },
     // createdBy:{
         // type: Schema.ObjectId,
         // required: [true, "CreatedBy is required."],

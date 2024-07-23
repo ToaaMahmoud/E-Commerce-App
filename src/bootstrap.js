@@ -1,10 +1,12 @@
+import path from 'path'
 import dotenv from 'dotenv'
 import { connection } from "../db/connection.js"
 import { globalErrorHandling } from "./utlis/asyncHandler.js"
 import categoryRouter from './modules/category/category.router.js'
 import subCategoryRouter  from './modules/subCategory/subCategory.router.js'
 import brandRouter from './modules/brand/brand.router.js'
-// import * as routers from './modules/importRouterFiles.js'
+import productRouter from './modules/product/product.router.js'
+
 const bootstrap = (app, express, cors) =>{
     const baseUrl = '/api/v1'
     process.on('uncaughtException', (err) => {
@@ -17,6 +19,8 @@ const bootstrap = (app, express, cors) =>{
     app.use(`${baseUrl}/categories`,categoryRouter)
     app.use(`${baseUrl}/sub-category`, subCategoryRouter)
     app.use(`${baseUrl}/brands`, brandRouter)
+    app.use(`${baseUrl}/products`, productRouter)
+    app.use(express.static('src/uploads'))
     app.use("*", (req, res) => {
             return next(new AppError("Api is not found.", 404))
           });

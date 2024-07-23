@@ -3,13 +3,10 @@ import Brand from "../../../../db/models/brand.model.js";
 import { AppError } from "../../../utlis/appError.js";
 
 export const addBrand = async (req, res, next) => {
-  const { name } = req.body;
-  const slug = slugify(name);
-  const category = new Brand({
-    name,
-    slug,
-  });
-  await category.save();
+if(req.body.name) req.body.slug = slugify(req.body.name)
+  const image = req.file ? req.file.filename : null;
+  if(image) req.body.image = image
+  const category = await Brand.create(req.body)
   return res.status(201).json({ message: "Brand added successfully." });
 };
 
@@ -30,9 +27,10 @@ export const getBrand = async (req, res, next) => {
 
 export const updateBrand = async (req, res, next) => {
   const { _id } = req.params;
-  const { ...updatedData } = req.body;
-  if ("name" in updatedData) updatedData.slug = slugify(updatedData.name);
-  const brand = await Brand.findByIdAndUpdate(_id, { ...updatedData }, {new: true});
+  if(req.body.name) req.body.slug = slugify(req.body.name)
+    const image = req.file ? req.file.filename : null;
+    if(image) req.body.image = image
+  const brand = await Brand.findByIdAndUpdate(_id, req.body, {new: true});
   return !brand
     ? next(new AppError("This brand is not found.", 404))
     : res.status(200).json({ message: "Brand updated successfully.", "Updated Brand" :brand });

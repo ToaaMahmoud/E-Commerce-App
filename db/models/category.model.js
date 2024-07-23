@@ -1,4 +1,4 @@
-import {Schema, model} from 'mongoose'
+import {Schema, model, set} from 'mongoose'
 
 const categorySchema = new Schema({
     name:{
@@ -15,7 +15,10 @@ const categorySchema = new Schema({
         lowerCase: true,
         trim :true
     },
-    image: String,
+    image: {
+        type: String,
+        set: (value) => `http://localhost:3000/category/${value}`
+    },
     // createdBy:{
         // type: Schema.ObjectId,
         // required: [true, "CreatedBy is required."],
@@ -27,6 +30,10 @@ const categorySchema = new Schema({
     // }
 }, {timestamps: true})
 
+
+// categorySchema.post('init', (doc) =>{
+//     if(doc.image) doc.image = 'http://localhost:3000/src/uploads/category' + doc.image
+// })
 const Category = model('Category', categorySchema)
 
 export default Category
