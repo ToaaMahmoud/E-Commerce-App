@@ -18,15 +18,15 @@ const brandSchema = new Schema({
         type: String,
         set: (value) => `http://localhost:3000/brand/${value}`
     },
-    // createdBy:{
-        // type: Schema.ObjectId,
-        // required: [true, "CreatedBy is required."],
-        // ref: 'User'
-    // },
-    // updatedBy:{
-        //    type: Schema.ObjectId,
-        //    ref: 'User'
-    // }
+    createdBy:{
+        type: Schema.ObjectId,
+        required: [true, "CreatedBy is required."],
+        ref: 'User'
+    },
+    updatedBy:{
+           type: Schema.ObjectId,
+           ref: 'User'
+    }
 }, {timestamps: true})
 
 const Brand = model('Brand', brandSchema)

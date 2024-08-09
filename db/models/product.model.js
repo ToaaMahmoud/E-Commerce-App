@@ -67,16 +67,20 @@ const productSchema = new Schema({
         ref: 'Brand',
         required: [true, "Brand is required."]
     },
-    // createdBy:{
-        // type: Schema.ObjectId,
-        // required: [true, "CreatedBy is required."],
-        // ref: 'User'
-    // },
-    // updatedBy:{
-        //    type: Schema.ObjectId,
-        //    ref: 'User'
-    // }
+    createdBy:{
+        type: Schema.ObjectId,
+        required: [true, "CreatedBy is required."],
+        ref: 'User'
+    },
+    updatedBy:{
+           type: Schema.ObjectId,
+           ref: 'User'
+    }
 }, {timestamps: true})
+
+productSchema.methods.inStock = function(quantity){
+    return (this.stock >= quantity)? true: false
+}
 
 const Product = model('Product', productSchema)
 

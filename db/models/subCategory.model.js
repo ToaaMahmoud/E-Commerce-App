@@ -18,15 +18,15 @@ const subCategorySchema = new Schema({
         type: String,
         set: (value) => `http://localhost:3000/subcategory/${value}`
     },
-    // createdBy:{
-        // type: Schema.ObjectId,
-        // required: [true, "CreatedBy is required."],
-        // ref: 'User'
-    // },
-    // updatedBy:{
-        //    type: Schema.ObjectId,
-        //    ref: 'User'
-    // },
+    createdBy:{
+        type: Schema.ObjectId,
+        required: [true, "CreatedBy is required."],
+        ref: 'User'
+    },
+    updatedBy:{
+           type: Schema.ObjectId,
+           ref: 'User'
+    },
     category:{
         type: Schema.ObjectId,
         required: [true, "Category is required."],

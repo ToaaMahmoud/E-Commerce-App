@@ -16,7 +16,7 @@ const transporter = nodemailer.createTransport({
 
 export const sendMail = ({ to = "", text = "", html = "", subject = "" }) => {
   transporter.sendMail({
-    from: "Job Search App <toaamahmoud1642003@gmail.com>",
+    from: "E-Commerce Site <toaamahmoud1642003@gmail.com>",
     to,
     subject,
     text,

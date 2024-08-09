@@ -1,13 +1,39 @@
 import { Router } from "express";
 import { asyncHandler } from "../../utlis/asyncHandler.js";
-import * as brandController from "./controller/brand.js"
+import * as brandController from "./controller/brand.js";
 import { createdMulter } from "../../middlewares/multer.js";
-const router = Router()
-router
-  .post("/add-brand",createdMulter('brand').single('image'), asyncHandler(brandController.addBrand))
+import validation from "../../middlewares/validation.middelware.js";
+import { addBrandSchema, updateBrandSchema } from "./brand.validation.js";
+import {
+  isAuthenticate,
+  isAuthorized,
+} from "../../middlewares/authenticate_authorizate.js";
+import { role } from "../../utlis/constant/user_role.js";
+const brandRouter = Router();
+brandRouter
+  .post(
+    "/add-brand",
+    isAuthenticate(),
+    isAuthorized([role.ADMIN, role.SELLER]),
+    createdMulter("brand").single("image"),
+    validation(addBrandSchema),
+    asyncHandler(brandController.addBrand)
+  )
   .get("/get-brands", asyncHandler(brandController.getBrands))
   .get("/get-brand/:_id", asyncHandler(brandController.getBrand))
-  .put("/update-brand/:_id",createdMulter('brand').single('image'), asyncHandler(brandController.updateBrand))
-  .delete("/delete-brand/:_id", asyncHandler(brandController.deleteBrand))
+  .put(
+    "/update-brand/:_id",
+    isAuthenticate(),
+    isAuthorized([role.ADMIN, role.SELLER]),
+    createdMulter("brand").single("image"),
+    validation(updateBrandSchema),
+    asyncHandler(brandController.updateBrand)
+  )
+  .delete(
+    "/delete-brand/:_id",
+    isAuthenticate(),
+    isAuthorized([role.ADMIN, role.SELLER]),
+    asyncHandler(brandController.deleteBrand)
+  );
 
-export default router
+export default brandRouter;

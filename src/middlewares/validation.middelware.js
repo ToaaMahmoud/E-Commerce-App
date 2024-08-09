@@ -1,16 +1,18 @@
-import { AppError } from "../utlis/appError.js"
 
-const reqKeys = ["body", "params", "query", "headers"]
 
-export const validation = (schema) =>{
+const validation = (schema) =>{
     return (req, res, next) =>{
-        let validationErrors = []
-        for (const key of reqKeys) {
-            const result = schema[key]?.validate(req[key],{abortEarly: false})
-            if(result?.error) validationErrors.push(result.error.details)
+        let inputData = {...req.body, ...req.params, ...req.query}
+        if(req.file){
+            inputData.file = {...req.file}
+        }
+        if(req.files){
+            inputData.files = {...req.files}
+        }
+        const {error} = schema.validate(inputData, {abortEarly: false})
+        if(error) return res.status(400).json({message: "Validation Error.", error : error.details})
+        return next()    
     }
-     validationErrors > 0
-       ? next(new AppError(`Validation Errors: ${validationErrors}`, 400))
-       : next();
 }
-}
+
+export default validation
