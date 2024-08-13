@@ -5,6 +5,5 @@ export const generateOTP = () => {
     upperCaseAlphabets: true,
     specialChars: false,
   });
-
   return OTP;
 };

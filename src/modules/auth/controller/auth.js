@@ -5,6 +5,7 @@ import { status } from '../../../utlis/constant/user_status.js'
 import { generateToken, verifyToken } from '../../../utlis/token.js'
 import { sendMail } from "../../../utlis/send.mail.js"
 import { Cart } from "../../../../db/indexImportFilesDB.js"
+import { generateOTP } from "../../../utlis/otp.generator.js"
 
 export const signUp = async(req, res, next) =>{
     // get all data.
@@ -15,13 +16,16 @@ export const signUp = async(req, res, next) =>{
     if(userExist?.email == email) return next(new AppError("This email is already used.", 409))
     else if(userExist?.phoneNumber == phoneNumber) return next(new AppError("This phone is already used.", 409))
 
+    // hash password.
+    const hashedPassword = hashPassword(passWord, 8)
+
     // prepare Data.
     const user = new User({
         userName,
         email,
         phoneNumber,
         DOB,
-        passWord,// in the 'user model' password will be hashed before user.save().
+        passWord: hashedPassword,
         address
     })
     
@@ -77,4 +81,72 @@ export const login = async(req, res, next) =>{
   return res
     .status(200)
     .json({ message: "Loged in Successfully.", accessToken: token });
+}
+
+export const forgetPassword = async(req, res, next) =>{
+    // get data from req.
+    const {email} = req.body
+
+    // check email existence.
+    const userExist = await User.findOne({email}) 
+    if(!userExist) return next(new AppError("User is not exist.", 404))
+    
+    // check if user already has otp.
+    if(userExist.otp && userExist.expireDateOtp > Date.now()){
+        return next(new AppError("OTP already sent to your email.", 400))
+    }
+    // generate OTP.    
+    const OTP = generateOTP()
+
+    // update user OTP.
+    userExist.otp = OTP
+    userExist.expireDateOtp = Date.now() + 15 * 60 * 1000 // date now + 15 min
+    
+    // save to db.
+    await userExist.save()
+
+    // send email.
+     sendMail({
+        to: email,
+        subject: "Forget Password of e-commerce app.",
+        html: `<h1>Your otp for forgeting password is ${OTP}, 
+        \n if not you ,reset your password.</h1>`
+    })
+
+    return res.status(200).json({message: "Check your email."})
+}
+
+export const changePassword = async(req, res, next) =>{
+    // get data from req.
+    const {otp, newPassword, email} = req.body
+
+    // check email.
+    const userExist = await User.findOne({email})
+    if(!userExist) return next(new AppError("User is not found.", 404))
+
+    // check otp.
+    if(userExist.otp != otp) return next(new AppError("Invalid otp.", 401)) 
+
+    // check otp expiration.       
+    if(userExist.expireDateOtp < Date.now()){
+        const OTP = generateOTP()
+        userExist.otp = OTP
+        userExist.expireDateOtp = Date.now() + 5 * 60 * 1000
+        await userExist.save()
+        sendMail({
+            to: email,
+            subject: "Resent otp.",
+            html: `<h1>Your otp is ${OTP}</h1>`
+        })
+        return res.status(200).json({message: "Otp is sent again, check your email."})
+    }
+
+    // hash new password.
+    const hashedPassword = hashPassword(newPassword, 8)
+    userExist.passWord = hashedPassword
+    userExist.otp = undefined
+    userExist.expireDateOtp = undefined
+    await userExist.save()
+
+    return res.status(200).json({message: "Password changed successfully."})
 }

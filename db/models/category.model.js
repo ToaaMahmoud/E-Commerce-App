@@ -31,9 +31,6 @@ const categorySchema = new Schema({
 }, {timestamps: true})
 
 
-// categorySchema.post('init', (doc) =>{
-//     if(doc.image) doc.image = 'http://localhost:3000/src/uploads/category' + doc.image
-// })
 const Category = model('Category', categorySchema)
 
 export default Category

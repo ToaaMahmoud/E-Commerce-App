@@ -23,6 +23,7 @@ const bootstrap = (app, express, cors) =>{
     app.use(`${baseUrl}/review`, allRouters.reviewRouter)
     app.use(`${baseUrl}/coupon`, allRouters.couponRouter)
     app.use(`${baseUrl}/cart`, allRouters.cartRouter)
+    app.use(`${baseUrl}/user`, allRouters.userRouter)
     app.use(express.static('src/uploads'))
     app.use("*", (req, res) => {
             return next(new AppError("Api is not found.", 404))

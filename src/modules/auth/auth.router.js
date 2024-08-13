@@ -10,4 +10,6 @@ authRouter
   .post("/sign-up", asyncHandler(authController.signUp))
   .get("/verify-email/:token", asyncHandler(authController.verifyEmail))
   .post("/login", validation(loginVal), asyncHandler(authController.login))
+  .post("/forget-password", asyncHandler(authController.forgetPassword))
+  .post("/change-password", asyncHandler(authController.changePassword))
 export default authRouter

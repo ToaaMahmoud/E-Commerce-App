@@ -8,5 +8,6 @@ export const addCouponSchema = joi.object({
   discountAmount: joi.number().positive().min(1),
   fromDate: joi.date().greater(Date.now() - (24*60*60*1000)).required(), // must be greater than or equal date now.
   toDate: joi.date().greater(joi.ref('fromDate')).required(), // must be greater than the fromDate.
-  couponType: joi.string().valid(...Object.values(couponTypes)).default(couponTypes.FIXED_AMOUNT)
+  couponType: joi.string().valid(...Object.values(couponTypes)).default(couponTypes.FIXED_AMOUNT),
+  maxUse: joi.number()
 }).required()

@@ -57,13 +57,12 @@ const userSchema = new Schema(
         },
       },
     ],
+    otp: String,
+    expireDateOtp : Date
   },
   { timestamps: true }
 );
 
-userSchema.pre('save', function(){
-    this.passWord = hashPassword(this.passWord, 8)   
-})
 const User =  model('User', userSchema)
 
 export default User
