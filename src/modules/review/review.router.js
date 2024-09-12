@@ -12,5 +12,6 @@ reviewRouter
         .post('/add-review', isAuthenticate(),validation(addReviewSchema) ,asyncHandler(reviewController.addReview))
         .get('/all-product-review', isAuthenticate(), asyncHandler(reviewController.getProductReview))
         .delete('/delete-review/:reviewId', isAuthenticate(), isAuthorized([role.ADMIN, role.CUSTOMER]), asyncHandler(reviewController.deleteReview))
+        .get('/all-user-reviews', isAuthenticate(), asyncHandler(reviewController.getAllUserReviews))
 
 export default reviewRouter

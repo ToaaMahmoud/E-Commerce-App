@@ -1,3 +1,4 @@
+import { Cart, Order, Review } from "../../../../db/indexImportFilesDB.js"
 import User from "../../../../db/models/user.model.js"
 import { AppError } from "../../../utlis/appError.js"
 import { role } from "../../../utlis/constant/user_role.js"
@@ -27,4 +28,24 @@ export const addUser = async(req, res, next) =>{
     });
     if(!createdUser) return next(new AppError("Failed to create user account.", 500))
      return res.status(201).json({message: "Account Created Successfully.", data: createdUser})      
+}
+
+export const deleteUser = async(req, res, next) =>{
+  // get data from req.
+  const {userId} = req.params
+
+  // delete user orders.
+  await Order.deleteMany({user:userId})
+
+  // delete user reviews.
+  await Review.deleteMany({user:userId})
+  
+  // delete user Cart.
+  await Cart.findOneAndDelete({user: userId})
+
+  // delete user.
+  await User.deleteOne()
+
+  return res.status(200).json({message: "User deleted successfully."})
+
 }

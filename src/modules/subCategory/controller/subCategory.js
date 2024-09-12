@@ -1,9 +1,9 @@
 import fs from 'fs'
 import path from 'path';
 import slugify from "slugify";
-import SubCategory from "../../../../db/models/subCategory.model.js";
 import { AppError } from "../../../utlis/appError.js";
 import ApiFeatures from "../../../utlis/apiFeatures.js";
+import { Product , SubCategory} from '../../../../db/indexImportFilesDB.js';
 
 export const addSubCategory = async (req, res, next) => {
   const name = req.body.name
@@ -76,6 +76,9 @@ export const deleteSubCategory = async (req, res, next) => {
   const subCategory = await SubCategory.findByIdAndDelete(_id)
   if(!subCategory) return next(new AppError("This subCategory is not found.", 404))
   
+  // Delete related products.
+  await Product.deleteMany({ subCategory: _id });
+
   // Delete the image from the 'uploads' folder if exist.  
   if(subCategory.image){
     const fileName = subCategory.image.split('/')[4]

@@ -1,7 +1,6 @@
 import {Schema, model} from 'mongoose'
 import { role } from '../../src/utlis/constant/user_role.js';
 import {status} from'../../src/utlis/constant/user_status.js'
-import { hashPassword } from '../../src/utlis/hash_and_compare.js';
 const userSchema = new Schema(
   {
     userName: {

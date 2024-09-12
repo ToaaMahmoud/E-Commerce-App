@@ -4,15 +4,18 @@ import { couponTypes } from "../../../utlis/constant/coupon_type.js";
 
 async function calcTotalPrice(cart) {
     const priceBeforeDiscount = cart.products.reduce((total, product) => total += (product.price * product.quantity), 0);
-    cart.priceBeforeDiscount = priceBeforeDiscount
-    if(!cart.coupon){
-        cart.totalPrice = priceBeforeDiscount
+    cart.priceBeforeDiscount = priceBeforeDiscount 
+
+    if (cart.coupon && cart.coupon.couponId != undefined) {
+        if (cart.coupon.discountType == couponTypes.FIXED_AMOUNT) {
+            cart.totalPrice = cart.priceBeforeDiscount - cart.coupon?.discount;
+        } else {
+            cart.totalPrice = cart.priceBeforeDiscount - (cart.priceBeforeDiscount * (cart.coupon?.discount / 100));
+        }
+    } else {
+        cart.totalPrice = priceBeforeDiscount;
     }
-    if(cart.discountType == couponTypes.FIXED_AMOUNT){
-        cart.totalPrice = cart.priceBeforeDiscount - cart.discount
-    }else{
-        cart.totalPrice = cart.priceBeforeDiscount - ((cart.priceBeforeDiscount) * (cart.discount / 100))
-    }
+
     await cart.save()
 }
 
@@ -26,7 +29,7 @@ export const addToCart = async(req, res, next) =>{
 
     // check the stock.
     if(!productExist.inStock(quantity)) return next (new AppError("Out of the stock.", 400))
-    
+        
     // check if product exist in the cart and update it.
     let cart = await Cart.findOneAndUpdate({user: req.authUser._id, 'products.productId': productId}, 
         {$set: {"products.$.quantity" : quantity}}, {new: true}).select('-__v -createdAt -updatedAt')
@@ -75,9 +78,13 @@ export const applyCoupon = async(req, res, next) =>{
 
     // get user cart and add discount amount.
     const userCart = await Cart.findOne({user: req.authUser._id}).select('-__v -createdAt -updatedAt')
-    userCart.discount = coupon.discountAmount 
-    userCart.discountType = coupon.couponType
-    userCart.coupon = couponCode
+    const usedCoupon = {
+        couponId: coupon._id,
+        code: coupon.couponCode,
+        discount: coupon.discountAmount,
+        discountType: coupon.couponType
+    }
+    userCart.coupon = usedCoupon
     await userCart.save()   
 
     // apply discount.
@@ -106,4 +113,26 @@ export const deleteProductFromCart = async(req, res, next) =>{
     calcTotalPrice(productInCart)
 
     return res.status(200).json({message: "Product deleted successfully.", Cart: productInCart})
+}
+
+export const clearCart = async(req, res, next) =>{
+    // get data from req.
+    const {cartId} = req.params
+
+    // check if cart exist or not.
+    const cart = await Cart.findById(cartId)
+    if(!cart) return next(new AppError("Cart is not exist", 404))
+   
+    // check if cart is for that user.    
+    if(toString(cart.user) != toString(req.authUser._id)) return next(new AppError("Not authorized.", 401))
+    
+    await cart.updateOne({
+        priceBeforeDiscount:0, 
+        discount: 0, 
+        totalPrice: 0, 
+        discountType: "fixedAmount",
+        products: []
+    })
+    await cart.save()
+    return res.status(200).json({message: "Cart cleared successfully."})
 }

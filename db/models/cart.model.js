@@ -31,23 +31,20 @@ const cartSchema = new Schema({
         min:0,
         default: 0
     },
-    discount:{
-        type: Number,
-        default: 0
-    },
-    discountType:{
-      type: String,
-      enum: Object.values(couponTypes),
-      default: couponTypes.FIXED_AMOUNT,
-    },
     totalPrice:{
         type: Number,
         min: 0,
         default: 0
     },
     coupon:{
-        type: String
-    }
+        couponId : {
+            type: Schema.ObjectId,
+            ref: 'Coupon'
+        },
+        code: String,
+        discount: Number,
+        discountType: String
+    },
 }, {timestamps: true})
 
 const Cart = model('Cart', cartSchema)

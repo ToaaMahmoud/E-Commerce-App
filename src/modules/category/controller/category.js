@@ -1,9 +1,10 @@
 import fs from 'fs'
 import path from 'path'
 import slugify from "slugify";
-import Category from "../../../../db/models/category.model.js";
+import { Category, Product, SubCategory } from '../../../../db/indexImportFilesDB.js';
 import { AppError } from "../../../utlis/appError.js";
 import ApiFeatures from "../../../utlis/apiFeatures.js";
+
 
 export const addCategory = async (req, res, next) => {
   const name = req.body.name
@@ -76,6 +77,12 @@ export const deleteCategory = async (req, res, next) => {
   const { _id } = req.params;
   const category = await Category.findByIdAndDelete(_id);
   if(!category) return next(new AppError("This category is not found.", 404))
+
+  // Delete related subcategory.
+  await SubCategory.deleteMany({ category: _id });
+
+  // Delete related products.
+  await Product.deleteMany({ category: _id });
 
   // Delete the image from the 'uploads' folder if exist.  
   if(category.image){

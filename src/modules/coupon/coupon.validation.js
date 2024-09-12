@@ -11,3 +11,12 @@ export const addCouponSchema = joi.object({
   couponType: joi.string().valid(...Object.values(couponTypes)).default(couponTypes.FIXED_AMOUNT),
   maxUse: joi.number()
 }).required()
+
+export const updateCouponSchema = joi.object({
+  couponCode: joi.string().length(7),
+  discountAmount: joi.number().positive().min(1),
+  toDate: joi.date().greater(Date.now() - (24*60*60*1000)),
+  couponType: joi.string().valid(...Object.values(couponTypes)).default(couponTypes.FIXED_AMOUNT),
+  maxUse: joi.number(),
+  _id: joi.string()
+}).required()

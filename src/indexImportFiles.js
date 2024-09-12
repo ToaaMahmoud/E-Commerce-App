@@ -10,6 +10,8 @@ import AdminRouter from './modules/admin/admin.router.js'
 import couponRouter from './modules/coupon/coupon.router.js'
 import cartRouter from './modules/cart/cart.router.js'
 import userRouter from './modules/user/user.router.js'
+import orderRouter from './modules/order/order.router.js'
+import addressRouter from './modules/address/address.router.js'
 
 export {AdminRouter, reviewRouter, authRouter, brandRouter, categoryRouter, productRouter,
-     wishlistRouter, subCategoryRouter, couponRouter, cartRouter, userRouter}
+     wishlistRouter, subCategoryRouter, couponRouter, cartRouter, userRouter, orderRouter, addressRouter}

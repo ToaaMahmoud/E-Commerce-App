@@ -12,4 +12,5 @@ cartRouter
         .post('/apply-coupon', isAuthenticate(), asyncHandler(cartController.applyCoupon))
         .get('/all-products-in-cart', isAuthenticate(), asyncHandler(cartController.getAllProducts))
         .delete('/remove-product/:productId', isAuthenticate(), isAuthorized([role.CUSTOMER, role.ADMIN]), asyncHandler(cartController.deleteProductFromCart))
+        .put('/clear-cart/:cartId', isAuthenticate(), asyncHandler(cartController.clearCart) )
 export default cartRouter

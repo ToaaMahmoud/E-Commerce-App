@@ -52,7 +52,7 @@ const couponSchema = new Schema(
 
 // check coupon validation.
 couponSchema.methods.isValidCoupon = function (coupon){
-  const now = Date.now()
+  const now = Date.now()  
   return coupon.fromDate <= now && coupon.toDate >= now ? true : false
 }
 

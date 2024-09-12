@@ -1,5 +1,6 @@
 import User from "../../db/models/user.model.js"
 import { AppError } from "../utlis/appError.js"
+import { status } from "../utlis/constant/user_status.js"
 import { verifyToken } from "../utlis/token.js"
 
 // check user is exist and loged in or not.
@@ -21,7 +22,7 @@ export const isAuthenticate = ()=>{
         // check if user with that token is exist in the system or not.
         const user = await User.findById(payload._id)
         if(!user) return next(new AppError("User is no longer exist.", 401))
-
+        if(user.isActive == false) return next(new AppError("Please, login first."))  
         req.authUser = user    
         next()       
     }
